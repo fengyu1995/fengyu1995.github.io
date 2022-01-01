@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>笔记</title>
+      <link href="/2022/01/01/%E7%AC%94%E8%AE%B0/%E7%AC%94%E8%AE%B0/"/>
+      <url>/2022/01/01/%E7%AC%94%E8%AE%B0/%E7%AC%94%E8%AE%B0/</url>
+      
+        <content type="html"><![CDATA[<p>开启笔记之旅</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>js代码</title>
+      <link href="/2022/01/01/js%E4%BB%A3%E7%A0%81/%E7%AC%AC%E4%B8%80%E4%B8%AA/"/>
+      <url>/2022/01/01/js%E4%BB%A3%E7%A0%81/%E7%AC%AC%E4%B8%80%E4%B8%AA/</url>
+      
+        <content type="html"><![CDATA[<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">a</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;这是一个代码块&#x27;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>体会</title>
+      <link href="/2022/01/01/%E5%BF%83%E5%BE%97/%E4%BD%93%E4%BC%9A/"/>
+      <url>/2022/01/01/%E5%BF%83%E5%BE%97/%E4%BD%93%E4%BC%9A/</url>
+      
+        <content type="html"><![CDATA[<p>这里是笔记的占位</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>欢迎光临网站！</title>
+      <link href="/2022/01/01/%E7%AC%AC%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0/"/>
+      <url>/2022/01/01/%E7%AC%AC%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0/</url>
+      
+        <content type="html"><![CDATA[<p><strong>欢迎光临风雨的博客！</strong></p><p><img src="https://cdn.jsdelivr.net/gh/fengyu1995/picGo/img/bg.jpg"></p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+  
+  
+</search>

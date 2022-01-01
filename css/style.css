@@ -1,0 +1,8 @@
+
+.aplayer.aplayer-fixed.aplayer-withlist .aplayer-lrc {
+  text-shadow: -1px -1px 0 #000;
+}
+.aplayer .aplayer-lrc .aplayer-lrc-contents p {
+  color: green;
+  opacity:1;
+}
