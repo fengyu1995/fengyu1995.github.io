@@ -17,11 +17,11 @@
     
     
     <entry>
-      <title>体会</title>
-      <link href="/2022/01/01/%E5%BF%83%E5%BE%97/%E4%BD%93%E4%BC%9A/"/>
-      <url>/2022/01/01/%E5%BF%83%E5%BE%97/%E4%BD%93%E4%BC%9A/</url>
+      <title>js代码</title>
+      <link href="/2022/01/01/js%E4%BB%A3%E7%A0%81/%E7%AC%AC%E4%B8%80%E4%B8%AA/"/>
+      <url>/2022/01/01/js%E4%BB%A3%E7%A0%81/%E7%AC%AC%E4%B8%80%E4%B8%AA/</url>
       
-        <content type="html"><![CDATA[<p>这里是笔记的占位</p>]]></content>
+        <content type="html"><![CDATA[<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">a</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;这是一个代码块&#x27;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure><p>什么是代码</p>]]></content>
       
       
       
@@ -30,11 +30,11 @@
     
     
     <entry>
-      <title>js代码</title>
-      <link href="/2022/01/01/js%E4%BB%A3%E7%A0%81/%E7%AC%AC%E4%B8%80%E4%B8%AA/"/>
-      <url>/2022/01/01/js%E4%BB%A3%E7%A0%81/%E7%AC%AC%E4%B8%80%E4%B8%AA/</url>
+      <title>体会</title>
+      <link href="/2022/01/01/%E5%BF%83%E5%BE%97/%E4%BD%93%E4%BC%9A/"/>
+      <url>/2022/01/01/%E5%BF%83%E5%BE%97/%E4%BD%93%E4%BC%9A/</url>
       
-        <content type="html"><![CDATA[<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">a</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;这是一个代码块&#x27;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure><p>什么是代码</p>]]></content>
+        <content type="html"><![CDATA[<p>这里是笔记的占位</p>]]></content>
       
       
       
