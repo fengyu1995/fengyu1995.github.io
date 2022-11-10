@@ -1,0 +1,1104 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>C#调用windows API的一些方法 | 风语的博客</title><meta name="author" content="风语"><meta name="copyright" content="风语"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="C#调用windows API的一些方法 使用C#调用windows API（从其它地方总结来的，以备查询） C#调用windows API也可以叫做C#如何直接调用非托管代码，通常有2种方法： 1．  直接调用从 DLL 导出的函数。 2．  调用 COM 对象上的接口方法 我主要讨论从dll中导出函数，基本步骤如下： 1．使用 C# 关键字 static 和 extern 声明方法。 2．将">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C#调用windows API的一些方法">
+<meta property="og:url" content="https://fengyu1995.github.io/post/fffd1735.html">
+<meta property="og:site_name" content="风语的博客">
+<meta property="og:description" content="C#调用windows API的一些方法 使用C#调用windows API（从其它地方总结来的，以备查询） C#调用windows API也可以叫做C#如何直接调用非托管代码，通常有2种方法： 1．  直接调用从 DLL 导出的函数。 2．  调用 COM 对象上的接口方法 我主要讨论从dll中导出函数，基本步骤如下： 1．使用 C# 关键字 static 和 extern 声明方法。 2．将">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/fengyu1995/picGo/img/bg1.jpg">
+<meta property="article:published_time" content="2022-11-10T08:33:23.000Z">
+<meta property="article:modified_time" content="2022-11-10T08:48:36.072Z">
+<meta property="article:author" content="风语">
+<meta property="article:tag" content="C#">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/fengyu1995/picGo/img/bg1.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://fengyu1995.github.io/post/fffd1735"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: 风语","link":"链接: ","source":"来源: 风语的博客","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'C#调用windows API的一些方法',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2022-11-10 16:48:36'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css"  media="defer" onload="this.media='all'"><link rel="stylesheet" href="/css/style.css"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-clock/lib/clock.min.css" /><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpeg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">23</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 我的标签页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影小丑拉片</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 网站链接</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://cdn.jsdelivr.net/gh/fengyu1995/picGo/img/bg1.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">风语的博客</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 我的标签页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影小丑拉片</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 网站链接</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">C#调用windows API的一些方法</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-11-10T08:33:23.000Z" title="发表于 2022-11-10 16:33:23">2022-11-10</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-11-10T08:48:36.072Z" title="更新于 2022-11-10 16:48:36">2022-11-10</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">6k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>23分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="C#调用windows API的一些方法"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p><a target="_blank" rel="noopener" href="http://www.cnblogs.com/benwu/p/4132026.html"><strong>C#调用windows API的一些方法</strong></a></p>
+<p><strong>使用C#调用windows API（从其它地方总结来的，以备查询）</strong></p>
+<p>C#调用windows API也可以叫做C#如何直接调用非托管代码，通常有2种方法：</p>
+<p>1．  直接调用从 DLL 导出的函数。</p>
+<p>2．  调用 COM 对象上的接口方法</p>
+<p>我主要讨论从dll中导出函数，基本步骤如下：</p>
+<p>1．使用 C# 关键字 <strong>static</strong> 和 <strong>extern</strong> 声明方法。</p>
+<p>2．将 <strong>DllImport</strong> 属性附加到该方法。<strong>DllImport</strong> 属性允许您指定包含该方法的 DLL 的名称。</p>
+<p>3．如果需要，为方法的参数和返回值指定自定义封送处理信息，这将重写 .NET Framework 的默认封送处理。</p>
+<p>1．首先我们查询MSDN找到GetShortPathName的原型定义</p>
+<p><strong>DWORD</strong> <strong>GetShortPathName(</strong></p>
+<p>  <strong>LPCTSTR</strong> <em>lpszLongPath</em><strong>,</strong></p>
+<p>  <strong>LPTSTR</strong> <em>lpszShortPath</em><strong>,</strong></p>
+<p>  <strong>DWORD</strong> <em>cchBuffer</em></p>
+<p><strong>);</strong></p>
+<p>2．查找对照表进行数据类型的转换（出处：<a target="_blank" rel="noopener" href="http://msdn.microsoft.com/msdnmag/issues/03/07/NET/default.aspx?fig=true">http://msdn.microsoft.com/msdnmag/issues/03/07/NET/default.aspx?fig=true</a>  <strong>）</strong>Data</p>
+<table>
+<thead>
+<tr>
+<th><strong>Win32 Types</strong></th>
+<th><strong>Specification</strong></th>
+<th><strong>CLR Type</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>char, INT8, SBYTE, CHARâ€</td>
+<td>8-bit signed integer</td>
+<td>System.SByte</td>
+</tr>
+<tr>
+<td>short, short int, INT16, SHORT</td>
+<td>16-bit signed integer</td>
+<td>System.Int16</td>
+</tr>
+<tr>
+<td>int, long, long int, INT32, LONG32, BOOLâ€ , INT</td>
+<td>32-bit signed integer</td>
+<td>System.Int32</td>
+</tr>
+<tr>
+<td>__int64, INT64, LONGLONG</td>
+<td>64-bit signed integer</td>
+<td>System.Int64</td>
+</tr>
+<tr>
+<td>unsigned char, UINT8, UCHARâ€ , BYTE</td>
+<td>8-bit unsigned integer</td>
+<td>System.Byte</td>
+</tr>
+<tr>
+<td>unsigned short, UINT16, USHORT, WORD, ATOM, WCHARâ€ , __wchar_t</td>
+<td>16-bit unsigned integer</td>
+<td>System.UInt16</td>
+</tr>
+<tr>
+<td>unsigned, unsigned int, UINT32, ULONG32, DWORD32, ULONG, DWORD, UINT</td>
+<td>32-bit unsigned integer</td>
+<td>System.UInt32</td>
+</tr>
+<tr>
+<td>unsigned __int64, UINT64, DWORDLONG, ULONGLONG</td>
+<td>64-bit unsigned integer</td>
+<td>System.UInt64</td>
+</tr>
+<tr>
+<td>float, FLOAT</td>
+<td>Single-precision floating point</td>
+<td>System.Single</td>
+</tr>
+<tr>
+<td>double, long double, DOUBLE</td>
+<td>Double-precision floating point</td>
+<td>System.Double</td>
+</tr>
+<tr>
+<td>â€ In Win32 this type is an integer with a specially assigned meaning; in contrast, the CLR provides a specific type devoted to this meaning.</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>3．调用GetShortPathName这个API，简单的写法如下（编译通过的话），</p>
+<p>using System;</p>
+<p>using <em>System.Runtime.InteropServices;</em></p>
+<p>​    public class MSSQL_ServerHandler</p>
+<p>​    {</p>
+<p>​        [<em>DllImport</em>(“kernel32.dll”)]</p>
+<p>​        public <em>static extern</em> int GetShortPathName</p>
+<p>​        (</p>
+<p>​            string path,</p>
+<p>​            StringBuilder shortPath,</p>
+<p>​            int shortPathLength</p>
+<p>)</p>
+<p>​     }</p>
+<p>而我们之前的例子：</p>
+<p>using System;</p>
+<p>using System.Runtime.InteropServices;</p>
+<p>​    public class MSSQL_ServerHandler</p>
+<p>​    {</p>
+<p>​        [DllImport(“kernel32.dll”, CharSet &#x3D; CharSet.Auto)]</p>
+<p>​        public static extern int GetShortPathName</p>
+<p>​        (</p>
+<p>​            [MarshalAs(UnmanagedType.LPTStr)] string path,</p>
+<p>​            [MarshalAs(UnmanagedType.LPTStr)] StringBuilder shortPath,</p>
+<p>​            int shortPathLength</p>
+<p>)</p>
+<p>​     }</p>
+<p>对比可知，其中DllImport ，static，extern基本上是必须有的，其他CharSet，MarshalAs（…）是可选项，在这里即使没有，程序也是可以调用此API了。</p>
+<p>说明：</p>
+<p>1．MSSQL_ServerHandler. GetShortPathName 方法用 <strong>static</strong> 和 <strong>extern</strong> 修饰符声明并且具有 <strong>DllImport</strong> 属性，该属性使用默认名称GetShortPathName 通知编译器此实现来自kernel32.dll。若要对 C# 方法使用不同的名称（如 getShort），则必须在 <strong>DllImport</strong> 属性中使用 <strong>EntryPoint</strong> 选项，如下所示：</p>
+<p><strong>[DllImport(“kernel32.dll”, EntryPoint&#x3D;”getShort”)]</strong></p>
+<p><strong>2．</strong>使用MarshalAs(UnmanagedType.LPTStr)保证了在任何平台上都会得到LPTStr，否则默认的方式会把从C#中的字符串作为BStr传递。</p>
+<p>现在如果是仅含有简单参数和返回值的WIN32 API，就都可以利用这种方法进行对照，简单的改写和调用了。</p>
+<p><strong>二．背后的原理 ―― 知其所以然，相关的知识</strong></p>
+<p> <strong>1．平台调用详原理</strong></p>
+<p>平台调用依赖于元数据在运行时查找导出的函数并封送其参数。下图显示了这一过程。</p>
+<p>对非托管 DLL 函数的“平台调用”调用</p>
+<p>当“平台调用”调用非托管函数时，它将依次执行以下操作：</p>
+<p>查找包含该函数的 DLL。</p>
+<p>将该 DLL 加载到内存中。</p>
+<p>查找函数在内存中的地址并将其参数推到堆栈上，以封送所需的数据。</p>
+<p><strong>注意</strong>   只在第一次调用函数时，才会查找和加载 DLL 并查找函数在内存中的地址。</p>
+<p>将控制权转移给非托管函数。</p>
+<p>平台调用会向托管调用方引发由非托管函数生成的异常。</p>
+<p> <strong>2．关于Attribute（属性，注意蓝色字）</strong></p>
+<p>属性可以放置在几乎所有声明中（但特定的属性可能限制它在其上有效的声明类型）。在语法上，属性的指定方法为：将括在方括号中的属性名置于其适用的实体声明之前。例如，具有 <strong>DllImport</strong> 属性的类将声明如下：</p>
+<p>[DllImport] public class MyDllimportClass { … }</p>
+<p>有关更多信息，请参见 <a target="_blank" rel="noopener" href="http://msdn.microsoft.com/library/CHS/cpref/html/frlrfSystemRuntimeInteropServicesDllImportAttributeClassTopic.asp">DllImportAttribute 类</a>。</p>
+<p>许多属性都带参数，而这些参数可以是定位（未命名）参数也可以是命名参数。任何定位参数都必须按特定顺序指定并且不能省略，而命名参数是可选的且可以按任意顺序指定。首先指定定位参数。例如，这三个属性是等效的：</p>
+<p>[DllImport(“user32.dll”, SetLastError&#x3D;false, ExactSpelling&#x3D;false)]</p>
+<p>[DllImport(“user32.dll”, ExactSpelling&#x3D;false, SetLastError&#x3D;false)]</p>
+<p>[DllImport(“user32.dll”)]</p>
+<p>第一个参数（DLL 名称）是定位参数并且总是第一个出现，其他参数为命名参数。在此例中，两个命名参数都默认为假，因此它们可以省略（有关默认参数值的信息，请参见各个属性的文档）。</p>
+<p>在一个声明中可以放置多个属性，可分开放置，也可放在同一组括号中：</p>
+<p>bool AMethod([In][Out]ref double x);</p>
+<p>bool AMethod([Out][In]ref double x);</p>
+<p>bool AMethod([In,Out]ref double x);</p>
+<p>某些属性对于给定实体可以指定多次。此类可多次使用的属性的一个示例是 <a target="_blank" rel="noopener" href="http://msdn.microsoft.com/library/CHS/csref/html/vclrfconditional.asp">Conditional</a>：</p>
+<p>[Conditional(“DEBUG”), Conditional(“TEST1”)] void TraceMethod() {…}</p>
+<p><strong>注意</strong>   根据约定，所有属性名称都以单词“Attribute”结束，以便将它们与 .NET Framework 中的其他项区分。但是，在代码中使用属性时不需要指定属性后缀。例如，[DllImport] 虽等效于 [DllImportAttribute]，但 <strong>DllImportAttribute</strong> 才是该属性在 .NET Framework 中的实际名称。</p>
+<p><strong>3．MarshalAsAttribute 类</strong></p>
+<p>指示如何在托管代码和非托管代码之间封送数据。可将该属性应用于参数、字段或返回值。</p>
+<p>该属性为可选属性，因为每个数据类型都有默认的封送处理行为。</p>
+<p>大多数情况下，该属性只是使用 <a target="_blank" rel="noopener" href="http://msdn.microsoft.com/library/CHS/cpref/html/frlrfsystemruntimeinteropservicesunmanagedtypeclasstopic.asp">UnmanagedType</a> 枚举标识非托管数据的格式。</p>
+<p>例如，默认情况下，公共语言运行库将字符串参数作为 <strong>BStr</strong> 封送到 COM 方法，但是可以通过制定MarshalAs属性，将字符串作为 <a target="_blank" rel="noopener" href="http://msdn.microsoft.com/library/CHS/cpref/html/frlrfsystemruntimeinteropservicesunmanagedtypeclasstopic.asp">LPStr</a>、<a target="_blank" rel="noopener" href="http://msdn.microsoft.com/library/CHS/cpref/html/frlrfsystemruntimeinteropservicesunmanagedtypeclasstopic.asp">LPWStr</a>、<a target="_blank" rel="noopener" href="http://msdn.microsoft.com/library/CHS/cpref/html/frlrfsystemruntimeinteropservicesunmanagedtypeclasstopic.asp">LPTStr</a> 或 <a target="_blank" rel="noopener" href="http://msdn.microsoft.com/library/CHS/cpref/html/frlrfsystemruntimeinteropservicesunmanagedtypeclasstopic.asp">BStr</a> 封送到非托管代码。某些 <strong>UnmanagedType</strong> 枚举成员需要附加信息。</p>
+<p>下面，就让我们写一个小程序，试一试如何用C#语言和DllImport特性来调用Win32 API。</p>
+<p>using System;</p>
+<p>using System.Runtime.InteropServices;</p>
+<p>class Program</p>
+<p>{</p>
+<p>​      [DllImport(“User32.dll”)]</p>
+<p>​      public static extern int MessageBox(int h, string m, string c, int type);</p>
+<p>​      static int Main()</p>
+<p>​      {</p>
+<p>​           MessageBox(0, “Hello Win32 API”, “水之真谛”, 4);</p>
+<p>​           Console.ReadLine();</p>
+<p>​           return 0;</p>
+<p>​      }</p>
+<p>}</p>
+<p>\1. 要使用DllImport这个特性（特性也是一种类），必须使用这一句</p>
+<p>using System.Runtime.InteropServices;</p>
+<p>\2. 然后我们就可以制造一个DllImport类的实例，并把这个实例绑定在我们要使用的函数上了。“特性类”这种类非常怪——制造类实例的时候不使用MyClass mc &#x3D; new MyClass();这种形式，而是使用**[特性类(参数列表)]<strong>这种形式；特性类不能独立存在，一定要用作修饰其它目标上（本例是修饰后面的一个函数），不同的特性可以用来修饰类、函数、变量等等；特性类实例在被编译的时候也不产生可执行代码，而是被放进metadata里以备检索。总之，你记住特性类很怪就是了，想了解更多就查查MSDN，懒得查就先这么记——不懂惯性定律不影响你学骑自行车。[DllImport(“User32.dll”)]是说我们要使用的Win32 API函数在User32.dll这个文件里。问题又来了：我怎么知道那么多API函数都在哪个dll文件里呢？这个你可以在MSDN里查到，位置是</strong>Root-&gt;Win32 and COM Development-&gt;Development Guides-&gt;Windows API-&gt;Windows API-&gt;Windows API Reference-&gt;Functions by Category<strong>。打开这页，你会看到有很多API的分类，API全在这里了。打开一个分类，比如Dialog Box，</strong>在Functions段**，你会看到很多具体的函数，其中就有上面用到的MessageBox函数，点击进入。你将打开MessageBox的详细解释和具体用法。它的名字、返回值、参数类型尽收眼底、一览无余！而且很练英文哦~~~~在这一页的底部，你可以看到一个小表格，里面有一项“Minimum DLL Version   user32.dll”就是说这个函数在user32.dll里。</p>
+<p>\3. 接下来就是我们的函数了。在C#里调用Win32函数有这么几个要点。</p>
+<p><strong>第一</strong>：名字要与Win32 API的完全一样。</p>
+<p><strong>第二</strong>：函数除了要有相应的DllImport类修饰外，还要声明成public static extern类型的。</p>
+<p><strong>第三</strong>：也是最变态的一点，函数的返回值和参数类型要与Win32 API完全一致！</p>
+<p>常用Win32数据类型与.NET平台数据类型的对应表：</p>
+<table>
+<thead>
+<tr>
+<th><strong>Win32 Types</strong></th>
+<th><strong>Specification</strong></th>
+<th><strong>CLR Type</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>char, INT8, SBYTE, CHAR</td>
+<td>8-bit signed integer</td>
+<td>System.SByte</td>
+</tr>
+<tr>
+<td>short, short int, INT16, SHORT</td>
+<td>16-bit signed integer</td>
+<td>System.Int16</td>
+</tr>
+<tr>
+<td>int, long, long int, INT32, LONG32, BOOL, INT</td>
+<td>32-bit signed integer</td>
+<td>System.Int32</td>
+</tr>
+<tr>
+<td>__int64, INT64, LONGLONG</td>
+<td>64-bit signed integer</td>
+<td>System.Int64</td>
+</tr>
+<tr>
+<td>unsigned char, UINT8, UCHAR, BYTE</td>
+<td>8-bit unsigned integer</td>
+<td>System.Byte</td>
+</tr>
+<tr>
+<td>unsigned short, UINT16, USHORT, WORD, ATOM, WCHAR, __wchar_t</td>
+<td>16-bit unsigned integer</td>
+<td>System.UInt16</td>
+</tr>
+<tr>
+<td>unsigned, unsigned int, UINT32, ULONG32, DWORD32, ULONG, DWORD, UINT</td>
+<td>32-bit unsigned integer</td>
+<td>System.UInt32</td>
+</tr>
+<tr>
+<td>unsigned __int64, UINT64, DWORDLONG, ULONGLONG</td>
+<td>64-bit unsigned integer</td>
+<td>System.UInt64</td>
+</tr>
+<tr>
+<td>float, FLOAT</td>
+<td>Single-precision floating point</td>
+<td>System.Single</td>
+</tr>
+<tr>
+<td>double, long double, DOUBLE</td>
+<td>Double-precision floating point</td>
+<td>System.Double</td>
+</tr>
+<tr>
+<td>In Win32 this type is an integer with a specially assigned meaning; in contrast, the CLR provides a specific type devoted to this meaning.</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>以MessageBox函数为例（看刚才给出的函数表），它的Win32原形如下：</p>
+<p>int <strong>MessageBox</strong>(HWND <em>hWnd</em>,   LPCTSTR <em>lpText</em>,    LPCTSTR <em>lpCaption</em>,  UINT <em>uType</em> );</p>
+<p><strong>函数名</strong>：MessageBox将保持不变。</p>
+<p><strong>返回值</strong>：int 将保持不变（无论是Win32还是C#，int都是32位整数）</p>
+<p><strong>参数表</strong>：H开头意味着是Handle，一般情况下Handld都是指针类型，Win32平台的指针类型是用32位来存储的，所以在C#里正好对应一个int整型。不过，既然是指针，就没有什么正负之分，32位都应该用来保存数值——这样一来，用uint（无符号32位整型）来对应Win32的H类型更合理。不过提醒大家一点，int是受C#和.NET CLR双重支持的，而uint只受C#支持而不受.NET CLR支持，所以，本例还是老老实实地使用了int型。（肚子饿了……再坚持坚持……）</p>
+<p>至于LPCTSTR是Long Pointer to Constant String的缩写，说白了就是——字符串。所以，用C#里的string类型就对了。</p>
+<p><strong>修饰符</strong>：要求有相应的DllImport和public static extern</p>
+<p>经过上面一番折腾，Win32的MessageBox函数就包装成C#可以调用的函数了：</p>
+<p>​    [DllImport(“User32.dll”)]</p>
+<p>​    public static extern int MessageBox(int h, string m, string c, int type);</p>
+<p><strong>第一个</strong>：弹出的MessageBox的父窗口是谁。本例中没有，所以是0，也就是“空指针”。</p>
+<p><strong>第二个</strong>：MessageBox的内容。本例中是“Hello Win32 API”。</p>
+<p><strong>第三个</strong>：MessageBox的标题。本例中用的是本人Blog的名字——水之真谛——请大家不要忘记。</p>
+<p><strong>第四个</strong>：MessageBox上的按钮是什么，如果是0，那就只有一个OK，MessageBox太短了，你将看不全“水之真谛”四个字，于是偶改成了4，这样就有两个按钮了。这些在MSDN的函数用法里都有。不过，我还是非常推荐您阅读一下本人的另一篇拙作<strong>《一个Win32程序的进化》</strong> 。</p>
+<p>​     </p>
+<p>三. 真的有必要吗？</p>
+<p>​        .NET Framework是对Win32 API的良好封装，大部分Win32 API函数都已经封装在了.NET Framework类库的各个类里了。    </p>
+<p>下面是个例子</p>
+<p>​        那是在很久很久以前，我给一个公司写程序用来控制用户登录，在登录之前，用户不能把鼠标移出登录窗体，因为要控制鼠标，所以我首先想起了调用Win32 API中与Cursor相关的函数来——于是不管三七二十一、花了九牛二虎之力调用了Win32 API中的ClipCursor()这个函数，效果还不错。</p>
+<p>​        结果前两天翻.NET Framework类库的时候，发现System.Windows.Forms.Cursor类的Clip属性就是专门做这个用的！差点没把鼻子气歪了……请大家自己动手创建一个C#的Windows程序，把下面的核心代码贴到主窗体的双击事件里，试一试。做这个例子的目的就是要告诉大家：<strong>1.对类库的了解程序直接决定了你编程的效率和质量——用类库里的组件比我们“从轮子造起”要快得多、安全得多。2.不到万不得已，不要去直接调Win32 API函数——那是不安全的。</strong></p>
+<p>Rectangle r &#x3D; new Rectangle(this.Left, this.Top, this.Width, this.Height);</p>
+<p>System.Windows.Forms.Cursor.Clip &#x3D; r;</p>
+<p>最后，大家一定非常想知道，.NET Framework都为我们封装好了哪些Win32 API，OK，MSDN里有一篇文章，专门列出了这些。文章的名字是《Microsoft Win32 to Microsoft .NET Framework API Map》  </p>
+<p>下面以C#为例简单介绍调用API的基本过程：  </p>
+<p>　 动态链接库函数声明部分一般由下列两部分组成，一是函数名或索引号，二是动态链接库的文件名。  </p>
+<p>　 譬如，你想调用User32.DLL中的MessageBox函数，我们必须指明函数的名字MessageBoxA或MessageBoxW，以及库名字User32.dll,我们知道Win32 API对每一个涉及字符串和字符的函数一般都存在两个版本，单字节字符的ANSI版本和双字节字符的UNICODE版本。 </p>
+<p>　 下面是一个调用API函数的例子：  </p>
+<p>[DllImport(“KERNEL32.DLL”, EntryPoint&#x3D;”MoveFileW”, SetLastError&#x3D;true,  </p>
+<p>CharSet&#x3D;CharSet.Unicode, ExactSpelling&#x3D;true,  </p>
+<p>CallingConvention&#x3D;CallingConvention.StdCall)]  </p>
+<p>public static extern bool MoveFile(String src, String dst);  </p>
+<p>　 其中入口点EntryPoint标识函数在动态链接库的入口位置，在一个受管辖的工程中，目标函数的原始名字和序号入口点不仅标识一个跨越互操作界限的函数。而且，你还可以把这个入口点映射为一个不同的名字，也就是对函数进行重命名。重命名可以给调用函数带来种种便利，通过重命名，一方面我们不用为函数的大小写伤透脑筋，同时它也可以保证与已有的命名规则保持一致，允许带有不同参数类型的函数共存，更重要的是它简化了对ANSI和Unicode版本的调用。CharSet用于标识函数调用所采用的是Unicode或是ANSI版本，ExactSpelling＝false将告诉编译器,让编译器决定使用Unicode或者是Ansi版本。其它的参数请参考MSDN在线帮助. </p>
+<p>在C#中，你可以在EntryPoint域通过名字和序号声明一个动态链接库函数，如果在方法定义中使用的函数名与DLL入口点相同，你不需要在EntryPoint域显示声明函数。否则，你必须使用下列属性格式指示一个名字和序号。 </p>
+<p>[DllImport(“dllname”, EntryPoint&#x3D;”Functionname”)]  </p>
+<p>[DllImport(“dllname”, EntryPoint&#x3D;”#123”)]  </p>
+<p>值得注意的是，你必须在数字序号前加“＃”  </p>
+<p>下面是一个用MsgBox替换MessageBox名字的例子：  </p>
+<p>using System.Runtime.InteropServices;  </p>
+<p>[DllImport(“user32.dll”, EntryPoint&#x3D;”MessageBox”)]  </p>
+<p>public static extern int MsgBox(int hWnd, String text, String caption, uint type);  </p>
+<p>许多受管辖的动态链接库函数期望你能够传递一个复杂的参数类型给函数，譬如一个用户定义的结构类型成员或者受管辖代码定义的一个类成员，这时你必须提供额外的信息格式化这个类型，以保持参数原有的布局和对齐。 </p>
+<p>C#提供了一个StructLayoutAttribute类，通过它你可以定义自己的格式化类型，在受管辖代码中，格式化类型是一个用StructLayoutAttribute说明的结构或类成员，通过它能够保证其内部成员预期的布局信息。布局的选项共有三种： </p>
+<p>布局选项  </p>
+<p>描述  </p>
+<p>LayoutKind.Automatic  </p>
+<p>为了提高效率允许运行态对类型成员重新排序。  </p>
+<p>注意：永远不要使用这个选项来调用不受管辖的动态链接库函数。  </p>
+<p>LayoutKind.Explicit  </p>
+<p>对每个域按照FieldOffset属性对类型成员排序  </p>
+<p>LayoutKind.Sequential  </p>
+<p>对出现在受管辖类型定义地方的不受管辖内存中的类型成员进行排序。  </p>
+<p>传递结构成员  </p>
+<p>下面的例子说明如何在受管辖代码中定义一个点和矩形类型，并作为一个参数传递给User32.dll库中的PtInRect函数，  </p>
+<p>函数的不受管辖原型声明如下：  </p>
+<p>BOOL PtInRect(const RECT *lprc, POINT pt);  </p>
+<p>注意你必须通过引用传递Rect结构参数，因为函数需要一个Rect的结构指针。  </p>
+<p>using System.Runtime.InteropServices;  </p>
+<p>[StructLayout(LayoutKind.Sequential)]  </p>
+<p>public struct Point {  </p>
+<p>public int x;  </p>
+<p>public int y;  </p>
+<p>}  </p>
+<p>[StructLayout(LayoutKind.Explicit]  </p>
+<p>public struct Rect {  </p>
+<p>[FieldOffset(0)] public int left;  </p>
+<p>[FieldOffset(4)] public int top;  </p>
+<p>[FieldOffset(8)] public int right;  </p>
+<p>[FieldOffset(12)] public int bottom;  </p>
+<p>}  </p>
+<p>[DllImport(“User32.dll”)]  </p>
+<p>public static extern Bool PtInRect(ref Rect r, Point p);  </p>
+<p>类似你可以调用GetSystemInfo函数获得系统信息：  </p>
+<p> using System.Runtime.InteropServices;  </p>
+<p>[StructLayout(LayoutKind.Sequential)]  </p>
+<p>public struct SYSTEM_INFO {  </p>
+<p>public uint dwOemId;  </p>
+<p>public uint dwPageSize;  </p>
+<p>public uint lpMinimumApplicationAddress;  </p>
+<p>public uint lpMaximumApplicationAddress;  </p>
+<p>public uint dwActiveProcessorMask;  </p>
+<p>public uint dwNumberOfProcessors;  </p>
+<p>public uint dwProcessorType;  </p>
+<p>public uint dwAllocationGranularity;  </p>
+<p>public uint dwProcessorLevel;  </p>
+<p>public uint dwProcessorRevision;  </p>
+<p>}  </p>
+<p>[DllImport(“kernel32”)]  </p>
+<p>static extern void GetSystemInfo(ref SYSTEM_INFO pSI);  </p>
+<p>SYSTEM_INFO pSI &#x3D; new SYSTEM_INFO();  </p>
+<p>GetSystemInfo(ref pSI);  </p>
+<p>类成员的传递  </p>
+<p>同样只要类具有一个固定的类成员布局，你也可以传递一个类成员给一个不受管辖的动态链接库函数，下面的例子主要说明如何传递一个sequential顺序定义的MySystemTime类给User32.dll的GetSystemTime函数, 函数用C&#x2F;C++调用规范如下: </p>
+<p>void GetSystemTime(SYSTEMTIME* SystemTime);  </p>
+<p>不像传值类型,类总是通过引用传递参数.  </p>
+<p>[StructLayout(LayoutKind.Sequential)]  </p>
+<p>public class MySystemTime {  </p>
+<p>public ushort wYear;  </p>
+<p>public ushort wMonth;  </p>
+<p>public ushort wDayOfWeek;  </p>
+<p>public ushort wDay;  </p>
+<p>public ushort wHour;  </p>
+<p>public ushort wMinute;  </p>
+<p>public ushort wSecond;  </p>
+<p>public ushort wMilliseconds;  </p>
+<p>}  </p>
+<p>[DllImport(“User32.dll”)]  </p>
+<p>public static extern void GetSystemTime(MySystemTime st);  </p>
+<p>回调函数的传递:  </p>
+<p>从受管辖的代码中调用大多数动态链接库函数,你只需创建一个受管辖的函数定义，然后调用它即可,这个过程非常直接。  </p>
+<p>如果一个动态链接库函数需要一个函数指针作为参数，你还需要做以下几步：  </p>
+<p>首先，你必须参考有关这个函数的文档，确定这个函数是否需要一个回调；第二，你必须在受管辖代码中创建一个回调函数；最后，你可以把指向这个函数的指针作为一个参数创递给DLL函数,. </p>
+<p><strong>回调函数及其实现:</strong>  </p>
+<p>回调函数经常用在任务需要重复执行的场合,譬如用于枚举函数,譬如Win32 API 中的EnumFontFamilies(字体枚举), EnumPrinters(打印机), EnumWindows (窗口枚举)函数. 下面以窗口枚举为例,谈谈如何通过调用EnumWindow 函数遍历系统中存在的所有窗口 </p>
+<p>分下面几个步骤:  </p>
+<p>\1. 在实现调用前先参考函数的声明  </p>
+<p>BOOL EnumWindows(WNDENUMPROC lpEnumFunc, LPARMAM IParam)  </p>
+<p>显然这个函数需要一个回调函数地址作为参数.  </p>
+<p>\2. 创建一个受管辖的回调函数,这个例子声明为代表类型(delegate),也就是我们所说的回调,它带有两个参数hwnd和lparam,第一个参数是一个窗口句柄，第二个参数由应用程序定义，两个参数均为整形。 </p>
+<p>当这个回调函数返回一个非零值时，标示执行成功，零则暗示失败，这个例子总是返回True值，以便持续枚举。</p>
+<p>\3. 最后创建以代表对象(delegate)，并把它作为一个参数传递给EnumWindows 函数，平台会自动地 把代表转化成函数能够识别的回调格式。 </p>
+<p>using System;  </p>
+<p>using System.Runtime.InteropServices;  </p>
+<p>public delegate bool CallBack(int hwnd, int lParam);  </p>
+<p>public class EnumReportApp {  </p>
+<p>[DllImport(“user32”)]  </p>
+<p>public static extern int EnumWindows(CallBack x, int y);  </p>
+<p>public static void Main()  </p>
+<p>{  </p>
+<p>   CallBack myCallBack &#x3D; new CallBack(EnumReportApp.Report);  </p>
+<p>   EnumWindows(myCallBack, 0);  </p>
+<p>}  </p>
+<p>public static bool Report(int hwnd, int lParam) {  </p>
+<p>​    Console.Write(“窗口句柄为”);  </p>
+<p>​    Console.WriteLine(hwnd);  </p>
+<p>​    return true;  </p>
+<p>}  </p>
+<p>}  </p>
+<p><strong>指针类型参数传递</strong>：  </p>
+<p>　 在Windows API函数调用时，大部分函数采用指针传递参数，对一个结构变量指针，我们除了使用上面的类和结构方法传递参数之外，我们有时还可以采用数组传递参数。 </p>
+<p>　 下面这个函数通过调用GetUserName获得用户名  </p>
+<p>BOOL GetUserName(  </p>
+<p>​    LPTSTR lpBuffer, &#x2F;&#x2F; 用户名缓冲区  </p>
+<p>​    LPDWORD nSize &#x2F;&#x2F; 存放缓冲区大小的地址指针  </p>
+<p>);  </p>
+<p>　   </p>
+<p>[DllImport(“Advapi32.dll”,  EntryPoint&#x3D;”GetComputerName”,  ExactSpelling&#x3D;false,  </p>
+<p>SetLastError&#x3D;true)]  </p>
+<p>static extern bool GetComputerName ( [MarshalAs(UnmanagedType.LPArray)] byte[] lpBuffer,  [MarshalAs(UnmanagedType.LPArray)] Int32[] nSize );  </p>
+<p>　 这个函数接受两个参数，char * 和int *,因为你必须分配一个字符串缓冲区以接受字符串指针，你可以使用String类代替这个参数类型，当然你还可以声明一个字节数组传递ANSI字符串，同样你也可以声明一个只有一个元素的长整型数组，使用数组名作为第二个参数。上面的函数可以调用如下： </p>
+<p>byte[] str&#x3D;new byte[20];  </p>
+<p>Int32[] len&#x3D;new Int32[1];  </p>
+<p>len[0]&#x3D;20;  </p>
+<p>GetComputerName (str,len);  </p>
+<p>MessageBox.Show(System.Text.Encoding.ASCII.GetString(str));  </p>
+<p><a target="_blank" rel="noopener" href="http://blog.csdn.net/JacksonH/archive/2005/07/27/436410.aspx"> <strong>C#与C++之间类型的对应</strong></a></p>
+<table>
+<thead>
+<tr>
+<th><strong>Windows Data Type</strong></th>
+<th><strong>.NET Data Type</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>BOOL, BOOLEAN</td>
+<td>Boolean or Int32</td>
+</tr>
+<tr>
+<td>BSTR</td>
+<td>String</td>
+</tr>
+<tr>
+<td>BYTE</td>
+<td>Byte</td>
+</tr>
+<tr>
+<td>CHAR</td>
+<td>Char</td>
+</tr>
+<tr>
+<td>DOUBLE</td>
+<td>Double</td>
+</tr>
+<tr>
+<td>DWORD</td>
+<td>Int32 or UInt32</td>
+</tr>
+<tr>
+<td>FLOAT</td>
+<td>Single</td>
+</tr>
+<tr>
+<td>HANDLE (and all other handle types, such as HFONT and HMENU)</td>
+<td>IntPtr, UintPtr or HandleRef</td>
+</tr>
+<tr>
+<td>HRESULT</td>
+<td>Int32 or UInt32</td>
+</tr>
+<tr>
+<td>INT</td>
+<td>Int32</td>
+</tr>
+<tr>
+<td>LANGID</td>
+<td>Int16 or UInt16</td>
+</tr>
+<tr>
+<td>LCID</td>
+<td>Int32 or UInt32</td>
+</tr>
+<tr>
+<td>LONG</td>
+<td>Int32</td>
+</tr>
+<tr>
+<td>LPARAM</td>
+<td>IntPtr, UintPtr or Object</td>
+</tr>
+<tr>
+<td>LPCSTR</td>
+<td>String</td>
+</tr>
+<tr>
+<td>LPCTSTR</td>
+<td>String</td>
+</tr>
+<tr>
+<td>LPCWSTR</td>
+<td>String</td>
+</tr>
+<tr>
+<td>LPSTR</td>
+<td>String or StringBuilder*</td>
+</tr>
+<tr>
+<td>LPTSTR</td>
+<td>String or StringBuilder</td>
+</tr>
+<tr>
+<td>LPWSTR</td>
+<td>String or StringBuilder</td>
+</tr>
+<tr>
+<td>LPVOID</td>
+<td>IntPtr, UintPtr or Object</td>
+</tr>
+<tr>
+<td>LRESULT</td>
+<td>IntPtr</td>
+</tr>
+<tr>
+<td>SAFEARRAY</td>
+<td>.NET array type</td>
+</tr>
+<tr>
+<td>SHORT</td>
+<td>Int16</td>
+</tr>
+<tr>
+<td>TCHAR</td>
+<td>Char</td>
+</tr>
+<tr>
+<td>UCHAR</td>
+<td>SByte</td>
+</tr>
+<tr>
+<td>UINT</td>
+<td>Int32 or UInt32</td>
+</tr>
+<tr>
+<td>ULONG</td>
+<td>Int32 or UInt32</td>
+</tr>
+<tr>
+<td>VARIANT</td>
+<td>Object</td>
+</tr>
+<tr>
+<td>VARIANT_BOOL</td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td>WCHAR</td>
+<td>Char</td>
+</tr>
+<tr>
+<td>WORD</td>
+<td>Int16 or UInt16</td>
+</tr>
+<tr>
+<td>WPARAM</td>
+<td>IntPtr, UintPtr or Object</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>另： 在进行string转换时，需要加入前缀[MarshalAs(UnmanagedType.LPStr)]</p>
+<p>LPDWORD   对应于  ref int</p>
+<table>
+<thead>
+<tr>
+<th><strong>C&#x2F;C++</strong></th>
+<th><strong>C#</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>HANDLE, LPDWORD, LPVOID, void*</td>
+<td>IntPtr</td>
+</tr>
+<tr>
+<td>LPCTSTR, LPCTSTR, LPSTR, char*, const char*, Wchar_t*, LPWSTR</td>
+<td>String [in], StringBuilder [in, out]</td>
+</tr>
+<tr>
+<td>DWORD, unsigned long, Ulong</td>
+<td>UInt32, [MarshalAs(UnmanagedType.U4)]</td>
+</tr>
+<tr>
+<td>bool</td>
+<td>bool</td>
+</tr>
+<tr>
+<td>LP<struct></td>
+<td>[In] ref <struct></td>
+</tr>
+<tr>
+<td>SIZE_T</td>
+<td>uint</td>
+</tr>
+<tr>
+<td>LPDWORD</td>
+<td>out uint</td>
+</tr>
+<tr>
+<td>LPTSTR</td>
+<td>[Out] StringBuilder</td>
+</tr>
+<tr>
+<td>PULARGE_INTEGER</td>
+<td>out ulong</td>
+</tr>
+<tr>
+<td>WORD</td>
+<td>uInt16</td>
+</tr>
+<tr>
+<td>Byte, unsigned char</td>
+<td>byte</td>
+</tr>
+<tr>
+<td>Short</td>
+<td>Int16</td>
+</tr>
+<tr>
+<td>Long, int</td>
+<td>Int32</td>
+</tr>
+<tr>
+<td>float</td>
+<td>single</td>
+</tr>
+<tr>
+<td>double</td>
+<td>double</td>
+</tr>
+<tr>
+<td>NULL pointer</td>
+<td>IntPtr.Zero</td>
+</tr>
+<tr>
+<td>Uint</td>
+<td>Uint32</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th><strong>Wtypes.h 中的非托管类型</strong></th>
+<th><strong>非托管 C 语言类型</strong></th>
+<th><strong>托管类名</strong></th>
+<th><strong>说明</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>HANDLE</td>
+<td>void*</td>
+<td>System.IntPtr</td>
+<td>在 32 位 Windows 操作系统上为 32 位，在 64 位 Windows 操作系统上为 64 位。</td>
+</tr>
+<tr>
+<td>BYTE</td>
+<td>unsigned char</td>
+<td>System.Byte</td>
+<td>8 位</td>
+</tr>
+<tr>
+<td>SHORT</td>
+<td>short</td>
+<td>System.Int16</td>
+<td>16 位</td>
+</tr>
+<tr>
+<td>WORD</td>
+<td>unsigned short</td>
+<td>System.UInt16</td>
+<td>16 位</td>
+</tr>
+<tr>
+<td>INT</td>
+<td>int</td>
+<td>System.Int32</td>
+<td>32 位</td>
+</tr>
+<tr>
+<td>UINT</td>
+<td>unsigned int</td>
+<td>System.UInt32</td>
+<td>32 位</td>
+</tr>
+<tr>
+<td>LONG</td>
+<td>long</td>
+<td>System.Int32</td>
+<td>32 位</td>
+</tr>
+<tr>
+<td>BOOL</td>
+<td>long</td>
+<td>System.Int32</td>
+<td>32 位</td>
+</tr>
+<tr>
+<td>DWORD</td>
+<td>unsigned long</td>
+<td>System.UInt32</td>
+<td>32 位</td>
+</tr>
+<tr>
+<td>ULONG</td>
+<td>unsigned long</td>
+<td>System.UInt32</td>
+<td>32 位</td>
+</tr>
+<tr>
+<td>CHAR</td>
+<td>char</td>
+<td>System.Char</td>
+<td>用 ANSI 修饰。</td>
+</tr>
+<tr>
+<td>LPSTR</td>
+<td>char*</td>
+<td>System.String 或 System.Text.StringBuilder</td>
+<td>用 ANSI 修饰。</td>
+</tr>
+<tr>
+<td>LPCSTR</td>
+<td>Const char*</td>
+<td>System.String 或 System.Text.StringBuilder</td>
+<td>用 ANSI 修饰。</td>
+</tr>
+<tr>
+<td>LPWSTR</td>
+<td>wchar_t*</td>
+<td>System.String 或 System.Text.StringBuilder</td>
+<td>用 Unicode 修饰。</td>
+</tr>
+<tr>
+<td>LPCWSTR</td>
+<td>Const wchar_t*</td>
+<td>System.String 或 System.Text.StringBuilder</td>
+<td>用 Unicode 修饰。</td>
+</tr>
+<tr>
+<td>FLOAT</td>
+<td>Float</td>
+<td>System.Single</td>
+<td>32 位</td>
+</tr>
+<tr>
+<td>DOUBLE</td>
+<td>Double</td>
+<td>System.Double</td>
+<td>64 位</td>
+</tr>
+</tbody></table>
+<p>BOOL&#x3D;System.Int32</p>
+<p>BOOLEAN&#x3D;System.Int32</p>
+<p>BYTE&#x3D;System.UInt16</p>
+<p>CHAR&#x3D;System.Int16</p>
+<p>COLORREF&#x3D;System.UInt32</p>
+<p>DWORD&#x3D;System.UInt32</p>
+<p>DWORD32&#x3D;System.UInt32</p>
+<p>DWORD64&#x3D;System.UInt64</p>
+<p>FLOAT&#x3D;System.Float</p>
+<p>HACCEL&#x3D;System.IntPtr</p>
+<p>HANDLE&#x3D;System.IntPtr</p>
+<p>HBITMAP&#x3D;System.IntPtr</p>
+<p>HBRUSH&#x3D;System.IntPtr</p>
+<p>HCONV&#x3D;System.IntPtr</p>
+<p>HCONVLIST&#x3D;System.IntPtr</p>
+<p>HCURSOR&#x3D;System.IntPtr</p>
+<p>HDC&#x3D;System.IntPtr</p>
+<p>HDDEDATA&#x3D;System.IntPtr</p>
+<p>HDESK&#x3D;System.IntPtr</p>
+<p>HDROP&#x3D;System.IntPtr</p>
+<p>HDWP&#x3D;System.IntPtr</p>
+<p>HENHMETAFILE&#x3D;System.IntPtr</p>
+<p>HFILE&#x3D;System.IntPtr</p>
+<p>HFONT&#x3D;System.IntPtr</p>
+<p>HGDIOBJ&#x3D;System.IntPtr</p>
+<p>HGLOBAL&#x3D;System.IntPtr</p>
+<p>HHOOK&#x3D;System.IntPtr</p>
+<p>HICON&#x3D;System.IntPtr</p>
+<p>HIMAGELIST&#x3D;System.IntPtr</p>
+<p>HIMC&#x3D;System.IntPtr</p>
+<p>HINSTANCE&#x3D;System.IntPtr</p>
+<p>HKEY&#x3D;System.IntPtr</p>
+<p>HLOCAL&#x3D;System.IntPtr</p>
+<p>HMENU&#x3D;System.IntPtr</p>
+<p>HMETAFILE&#x3D;System.IntPtr</p>
+<p>HMODULE&#x3D;System.IntPtr</p>
+<p>HMONITOR&#x3D;System.IntPtr</p>
+<p>HPALETTE&#x3D;System.IntPtr</p>
+<p>HPEN&#x3D;System.IntPtr</p>
+<p>HRGN&#x3D;System.IntPtr</p>
+<p>HRSRC&#x3D;System.IntPtr</p>
+<p>HSZ&#x3D;System.IntPtr</p>
+<p>HWINSTA&#x3D;System.IntPtr</p>
+<p>HWND&#x3D;System.IntPtr</p>
+<p>INT&#x3D;System.Int32</p>
+<p>INT32&#x3D;System.Int32</p>
+<p>INT64&#x3D;System.Int64</p>
+<p>LONG&#x3D;System.Int32</p>
+<p>LONG32&#x3D;System.Int32</p>
+<p>LONG64&#x3D;System.Int64</p>
+<p>LONGLONG&#x3D;System.Int64</p>
+<p>LPARAM&#x3D;System.IntPtr</p>
+<p>LPBOOL&#x3D;System.Int16[]</p>
+<p>LPBYTE&#x3D;System.UInt16[]</p>
+<p>LPCOLORREF&#x3D;System.UInt32[]</p>
+<p>LPCSTR&#x3D;System.String</p>
+<p>LPCTSTR&#x3D;System.String</p>
+<p>LPCVOID&#x3D;System.UInt32</p>
+<p>LPCWSTR&#x3D;System.String</p>
+<p>LPDWORD&#x3D;System.UInt32[]</p>
+<p>LPHANDLE&#x3D;System.UInt32</p>
+<p>LPINT&#x3D;System.Int32[]</p>
+<p>LPLONG&#x3D;System.Int32[]</p>
+<p>LPSTR&#x3D;System.String</p>
+<p>LPTSTR&#x3D;System.String</p>
+<p>LPVOID&#x3D;System.UInt32</p>
+<p>LPWORD&#x3D;System.Int32[]</p>
+<p>LPWSTR&#x3D;System.String</p>
+<p>LRESULT&#x3D;System.IntPtr</p>
+<p>PBOOL&#x3D;System.Int16[]</p>
+<p>PBOOLEAN&#x3D;System.Int16[]</p>
+<p>PBYTE&#x3D;System.UInt16[]</p>
+<p>PCHAR&#x3D;System.Char[]</p>
+<p>PCSTR&#x3D;System.String</p>
+<p>PCTSTR&#x3D;System.String</p>
+<p>PCWCH&#x3D;System.UInt32</p>
+<p>PCWSTR&#x3D;System.UInt32</p>
+<p>PDWORD&#x3D;System.Int32[]</p>
+<p>PFLOAT&#x3D;System.Float[]</p>
+<p>PHANDLE&#x3D;System.UInt32</p>
+<p>PHKEY&#x3D;System.UInt32</p>
+<p>PINT&#x3D;System.Int32[]</p>
+<p>PLCID&#x3D;System.UInt32</p>
+<p>PLONG&#x3D;System.Int32[]</p>
+<p>PLUID&#x3D;System.UInt32</p>
+<p>PSHORT&#x3D;System.Int16[]</p>
+<p>PSTR&#x3D;System.String</p>
+<p>PTBYTE&#x3D;System.Char[]</p>
+<p>PTCHAR&#x3D;System.Char[]</p>
+<p>PTSTR&#x3D;System.String</p>
+<p>PUCHAR&#x3D;System.Char[]</p>
+<p>PUINT&#x3D;System.UInt32[]</p>
+<p>PULONG&#x3D;System.UInt32[]</p>
+<p>PUSHORT&#x3D;System.UInt16[]</p>
+<p>PVOID&#x3D;System.UInt32</p>
+<p>PWCHAR&#x3D;System.Char[]</p>
+<p>PWORD&#x3D;System.Int16[]</p>
+<p>PWSTR&#x3D;System.String</p>
+<p>REGSAM&#x3D;System.UInt32</p>
+<p>SC_HANDLE&#x3D;System.IntPtr</p>
+<p>SC_LOCK&#x3D;System.IntPtr</p>
+<p>SHORT&#x3D;System.Int16</p>
+<p>SIZE_T&#x3D;System.UInt32</p>
+<p>SSIZE_&#x3D;System.UInt32</p>
+<p>TBYTE&#x3D;System.Char</p>
+<p>TCHAR&#x3D;System.Char</p>
+<p>UCHAR&#x3D;System.</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://fengyu1995.github.io/">风语</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://fengyu1995.github.io/post/fffd1735.html">https://fengyu1995.github.io/post/fffd1735.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://fengyu1995.github.io" target="_blank">风语的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/C/">C#</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/gh/fengyu1995/picGo/img/bg1.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/post/5e51f5d.html"><img class="prev-cover" src="https://cdn.jsdelivr.net/gh/fengyu1995/picGo/img/bg4.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">时间戳</div></div></a></div><div class="next-post pull-right"><a href="/post/2e7ea77f.html"><img class="next-cover" src="https://cdn.jsdelivr.net/gh/fengyu1995/picGo/img/bg4.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">C#字符串的中文、数字、字母检测</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/post/d777309e.html" title="C#字符串Des和Md5加密"><img class="cover" src="https://cdn.jsdelivr.net/gh/fengyu1995/picGo/img/bg1.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-11-10</div><div class="title">C#字符串Des和Md5加密</div></div></a></div><div><a href="/post/2e7ea77f.html" title="C#字符串的中文、数字、字母检测"><img class="cover" src="https://cdn.jsdelivr.net/gh/fengyu1995/picGo/img/bg4.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-11-10</div><div class="title">C#字符串的中文、数字、字母检测</div></div></a></div><div><a href="/post/b356ea04.html" title="C#的序列化反序列化"><img class="cover" src="https://cdn.jsdelivr.net/gh/fengyu1995/picGo/img/bg4.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-11-10</div><div class="title">C#的序列化反序列化</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="lv-container" data-id="city" data-uid="MTAyMC81NzU5NC8zNDA1OA=="></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">风语</div><div class="author-info__description">风语的领地,欢迎来踩！</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">23</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/fengyu1995"><i class="fab fa-github"></i><span>关注我</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/fengyu1995" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:huangdongxusjz@163.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到风语的博客</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/post/8353f4de.html" title="Git 常用命令大全"><img src="https://cdn.jsdelivr.net/gh/fengyu1995/picGo/img/bg1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Git 常用命令大全"/></a><div class="content"><a class="title" href="/post/8353f4de.html" title="Git 常用命令大全">Git 常用命令大全</a><time datetime="2022-11-10T08:42:54.000Z" title="发表于 2022-11-10 16:42:54">2022-11-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/post/34a2bdf1.html" title="ARPG相机"><img src="https://cdn.jsdelivr.net/gh/fengyu1995/picGo/img/bg4.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ARPG相机"/></a><div class="content"><a class="title" href="/post/34a2bdf1.html" title="ARPG相机">ARPG相机</a><time datetime="2022-11-10T08:35:56.000Z" title="发表于 2022-11-10 16:35:56">2022-11-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/post/5e51f5d.html" title="时间戳"><img src="https://cdn.jsdelivr.net/gh/fengyu1995/picGo/img/bg4.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="时间戳"/></a><div class="content"><a class="title" href="/post/5e51f5d.html" title="时间戳">时间戳</a><time datetime="2022-11-10T08:34:36.000Z" title="发表于 2022-11-10 16:34:36">2022-11-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/post/fffd1735.html" title="C#调用windows API的一些方法"><img src="https://cdn.jsdelivr.net/gh/fengyu1995/picGo/img/bg1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="C#调用windows API的一些方法"/></a><div class="content"><a class="title" href="/post/fffd1735.html" title="C#调用windows API的一些方法">C#调用windows API的一些方法</a><time datetime="2022-11-10T08:33:23.000Z" title="发表于 2022-11-10 16:33:23">2022-11-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/post/2e7ea77f.html" title="C#字符串的中文、数字、字母检测"><img src="https://cdn.jsdelivr.net/gh/fengyu1995/picGo/img/bg4.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="C#字符串的中文、数字、字母检测"/></a><div class="content"><a class="title" href="/post/2e7ea77f.html" title="C#字符串的中文、数字、字母检测">C#字符串的中文、数字、字母检测</a><time datetime="2022-11-10T08:31:42.000Z" title="发表于 2022-11-10 16:31:42">2022-11-10</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://cdn.jsdelivr.net/gh/fengyu1995/picGo/img/bg1.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By 风语</div><div class="footer_custom_text"><div><a onclick="window.open('http://www.baidu.com')" class="footer-a">百度</a></div><div>欢迎你</div></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><script src="/js/search/local-search.js"></script><div class="js-pjax"><script>function loadLivere () {
+  if (typeof LivereTower === 'object') {
+    window.LivereTower.init()
+  }
+  else {
+    (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+    })(document, 'script');
+  }
+}
+
+if ('Livere' === 'Livere' || !false) {
+  if (false) btf.loadComment(document.getElementById('lv-container'), loadLivere)
+  else loadLivere()
+}
+else {
+  function loadOtherComment () {
+    loadLivere()
+  }
+}</script></div><div class="aplayer no-destroy" data-id="3136952023" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false" muted data-lrctype="1"> </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["meta[property=\"og:image\"]","meta[property=\"og:title\"]","meta[property=\"og:url\"]","head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><!-- hexo injector body_end start --><script data-pjax>
+  function butterfly_clock_injector_config(){
+    var parent_div_git = document.getElementsByClassName('sticky_layout')[0];
+    var item_html = '<div class="card-widget card-clock"><div class="card-glass"><div class="card-background"><div class="card-content"><div id="hexo_electric_clock"><img class="entered loading" id="card-clock-loading" src="https://npm.elemecdn.com/hexo-butterfly-clock/lib/loading.gif" style="height: 120px; width: 100%;" data-ll-status="loading"/></div></div></div></div></div>';
+    console.log('已挂载butterfly_clock')
+    parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_clock_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_clock_injector_config();
+  }
+  </script><script src="https://pv.sohu.com/cityjson?ie=utf-8"></script><script data-pjax src="https://npm.elemecdn.com/hexo-butterfly-clock/lib/clock.min.js"></script><!-- hexo injector body_end end --><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/hibiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body></html>
